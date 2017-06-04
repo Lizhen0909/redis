@@ -143,6 +143,7 @@ int BfHincr_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
 
 	size_t len2 = 0;
 	const char* strhkey = RM_StringPtrLen(hkey, &len2);
+	/*printf("%s -----  %s\n", strkey, strhkey); */
 
 	bloomfilter_count_t* bf = get_bloomfilter(strkey);
 	if (scaling_bloom_check(bf->bloomfilter, strhkey, len2)) {
@@ -172,11 +173,11 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
 		printf("Module loaded with ARGV[%d] = %s\n", j, s);
 	}
 
-	if (RedisModule_CreateCommand(ctx, "bf.hincr", BfHincr_RedisCommand,
+	if (RedisModule_CreateCommand(ctx, "bfhincr", BfHincr_RedisCommand,
 			"write deny-oom", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
-	if (RedisModule_CreateCommand(ctx, "bf.flushall", BfFlushALL_RedisCommand,
+	if (RedisModule_CreateCommand(ctx, "bfflushall", BfFlushALL_RedisCommand,
 			"write", 0, 0, 0) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
