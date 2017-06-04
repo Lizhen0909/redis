@@ -51,7 +51,6 @@ GHashTable * get_bloomfilter_hashtable();
 
 typedef struct {
 	long index;
-	char filename[120];
 	scaling_bloom_t* bloomfilter;
 } bloomfilter_count_t;
 
@@ -62,7 +61,6 @@ void free_string(gpointer data) {
 void free_bloomfilter(gpointer data) {
 	bloomfilter_count_t *bf = (bloomfilter_count_t*) data;
 	free_scaling_bloom(bf->bloomfilter);
-	remove(bf->filename);
 	free(bf);
 }
 
@@ -86,17 +84,13 @@ bloomfilter_count_t* get_bloomfilter(const char* name) {
 		return (bloomfilter_count_t *) val;
 	} else {
 		char* copied_name = g_strdup(name);
-		char *templatebuf = tempnam("/tmp", "rbf_");
-
 		unsigned int sz = 64 * 1024 * 1024;
-		scaling_bloom_t *scale_bf = new_scaling_bloom(sz, 0.01, templatebuf);
+		scaling_bloom_t *scale_bf = new_scaling_bloom(sz, 0.01);
 		bloomfilter_count_t *bf = malloc(sizeof(bloomfilter_count_t));
 		bf->index = 0;
 		bf->bloomfilter = scale_bf;
-		strcpy(bf->filename, templatebuf);
-		g_hash_table_insert(global_bloomfilters, copied_name, bf);
-		free(templatebuf);
-		return bf;
+ 		g_hash_table_insert(global_bloomfilters, copied_name, bf);
+ 		return bf;
 	}
 
 }
