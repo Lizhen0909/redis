@@ -13,16 +13,22 @@ endif
 
 .SUFFIXES: .c .so .xo .o
 
-all: helloworld.so hellotype.so helloblock.so testmodule.so
+all: helloworld.so hellotype.so helloblock.so testmodule.so bloomfilter.so
 
 .c.xo:
 	$(CC) -I. $(CFLAGS) $(SHOBJ_CFLAGS) -fPIC -c $< -o $@
-
+ 
 helloworld.xo: ../redismodule.h
 
 helloworld.so: helloworld.xo
 	$(LD) -o $@ $< $(SHOBJ_LDFLAGS) $(LIBS) -lc
 
+bloomfilter.xo: bloomfilter.c ../redismodule.h
+	$(CC) -I. $(CFLAGS) $(SHOBJ_CFLAGS)  `pkg-config --cflags glib-2.0` -fPIC -c $< -o $@
+
+bloomfilter.so: bloomfilter.xo
+	$(LD) -o $@ $< $(SHOBJ_LDFLAGS) $(LIBS) `pkg-config --libs glib-2.0` -lc ../../deps/dablooms/build/libdablooms.a
+	
 hellotype.xo: ../redismodule.h
 
 hellotype.so: hellotype.xo
